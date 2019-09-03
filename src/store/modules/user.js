@@ -5,8 +5,8 @@ import { Message } from 'element-ui'
 
 const state = {
   token: getToken(),
-  name: '',
-  avatar: ''
+  name: 'Kane X',
+  avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'
 }
 
 const mutations = {
@@ -34,7 +34,9 @@ const actions = {
         commit('SET_NAME', 'Kane X')
         commit('SET_AVATAR', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
         localStorage.setItem('token', response.result.token)
-
+        // 本应是获取个人信息后存的，因为文件上传问题，暂时存
+        localStorage.setItem('name', 'Kane X')
+        localStorage.setItem('avatar', 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif')
         setToken(response.result.token)
         resolve()
       }).catch(error => {
