@@ -3,48 +3,17 @@
     <div class="list-wrapper" ref="page">
       <div class="list-title">
         <el-row :gutter="20">
-          <div>
-            <el-col>
-              <el-input 
-                placeholder="输入内容名称"
-                v-model="input"
-                @keyup.enter.native="handleIconClick">
-              </el-input>
-            </el-col>
-            <el-col>
-              <el-button @click.native="handleIconClick">搜索</el-button>
-            </el-col>
-            <el-col>
-              <el-select v-model="status" placeholder="全部状态">
-                <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
-            </el-col>
-          </div>
           <el-col style="float: right">
-            <el-button type="success" @click="toCreate">新建图文</el-button>
+            <el-button type="success" @click="toCreate">新建目录</el-button>
           </el-col>
         </el-row>
       </div>
       <!-- table -->
       <el-table :data='list' stripe width='100%' ref="table">
-        <el-table-column label='内容名称' prop='title' min-width="300px">
+        <el-table-column label='名称' prop='name' min-width="300px"></el-table-column>
+        <el-table-column label='创建日期' align="center" min-width="180px">
           <template slot-scope='props'>
-            <div class="title-img">
-              <div class="font-zone">
-                <h4 class="nowrap-2">{{props.row.title}}</h4>
-                <span class="nowrap">创建时间：{{props.row.createdAt | format}}</span>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-        <el-table-column label='所属分类' prop='catalogName' align="center" width="100px" min-width="100px">
-          <template slot-scope='props'>
-            <span class="nowrap">{{props.row.catalogName || '/'}}</span>
+            <span class="nowrap">{{props.row.createdAt | format}}</span>
           </template>
         </el-table-column>
         <el-table-column label='操作' width='200px' min-width="200px" align="center">
@@ -66,49 +35,56 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="total">
       </el-pagination>
+      <el-dialog
+        title="新建目录"
+        :visible.sync="dialogCatalog">
+        <el-form
+          ref="ruleForm"
+          :model='catalogForm'
+          :rules="rules"
+          label-width='100px'>
+          <el-form-item label="名称" prop="name">
+            <el-col>
+              <el-input v-model="catalogForm.name" :maxlength="10" placeholder="不超过10个字"></el-input>
+            </el-col>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogCatalog = false">取消</el-button>
+          <el-button type="primary" @click="save('ruleForm')">确定</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
 <script>
-import { articles } from '@/api/content'
+import * as serviceSetting from '@/api/setting'
 import { faultHandler } from '@/utils'
 
 export default {
-  name: 'articleList',
+  name: 'list',
   data() {
     return {
+      rules: {
+        name: [{
+          required: true,
+          message: '标题不能为空',
+          trigger: 'blur'
+        }, {
+          min: 1,
+          max: 10,
+          message: '标题字数为1-10个字',
+          trigger: 'blur'
+        }]
+      },
       limit: 10,
       total: 0,
       currentPage: 1,
-      reference: 'reference',
       input: '',
-      status: '',
-      options: [
-        {
-          label: '全部状态',
-          value: -1
-        }, {
-          label: '上架',
-          value: 2
-        }, {
-          label: '下架',
-          value: 1
-        }, {
-          label: '定时上架',
-          value: 3
-        }
-      ],
       list: [],
-      selection: [],
-      screenObj: {},
-      times: '',
-      dialogTableVisible: false,
-      carouseForm: {},
-      storeId: '',
-      pickfuture: {
-        disabledDate(time) {
-          return time.getTime() < Date.now() - 8.64e7
-        }
+      dialogCatalog: false,
+      catalogForm: {
+        name: ''
       }
     }
   },
@@ -116,17 +92,23 @@ export default {
     this.getList()
   },
   methods: {
+    save(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          serviceSetting.createCatalog(this.catalogForm).then(response => {
+            this.$message.success('创建成功')
+            this.getList()
+            this.dialogCatalog = false
+          }).catch(faultHandler)
+        }
+      })
+    },
     getList(data) {
       data = data || {}
-      articles(data).then(response => {
+      serviceSetting.catalogs(data).then(response => {
         this.list = [].concat(response.datas)
         this.total = response.total
       }).catch(faultHandler)
-    },
-    handleIconClick() {
-      let obj = this.screenObj
-      obj.keyword = this.input
-      this.getList(obj)
     },
     handleSizeChange (val) {
       this.limit = val
@@ -140,7 +122,7 @@ export default {
       this.getList(obj)
     },
     toCreate() {
-      this.$router.push('/content/articlecreate')
+      this.dialogCatalog = true
     },
     remove(data) {
       MessageBox.confirm('是否删除内容', '确定删除', {

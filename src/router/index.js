@@ -81,6 +81,28 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/setting',
+    component: Layout,
+    redirect: '/setting/catalog',
+    name: 'Setting',
+    meta: { title: '设置', icon: 'example' },
+    children: [
+      {
+        path: '/setting/catalog',
+        name: 'Catalog',
+        component: () => import('@/views/setting/catalog'),
+        meta: { title: '目录', icon: 'example' }
+      },
+      {
+        path: '/setting/catalogcreate',
+        name: 'CatalogCreate',
+        component: () => import('@/views/setting/catalogCreate'),
+        meta: { title: '添加目录' },
+        hidden: true 
+      }
+    ]
+  },
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }

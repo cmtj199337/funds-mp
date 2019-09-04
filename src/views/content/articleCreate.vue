@@ -8,6 +8,14 @@
             <el-input v-model="form.title" :maxlength="40" placeholder="请输入2-40个汉字"></el-input>
           </el-col>
         </el-form-item>
+        <!-- 内容目录 -->
+        <el-form-item label="目录" prop="catalogId">
+          <el-col :span='20'>
+            <el-select v-model="form.catalogId" placeholder="请选择">
+              <el-option :value='item._id' :label="item.name" v-for="item in catList" :key="item._id"></el-option>
+            </el-select>
+          </el-col>
+        </el-form-item>
         <!-- 内容介绍 -->
         <el-form-item label='内容' prop="intro">
           <el-col :span='20'>
@@ -25,6 +33,7 @@
 <script>
   import Tinymce from '@/components/Tinymce'
   import { createArticle } from '@/api/content'
+  import * as serviceSetting from '@/api/setting'
   import { faultHandler } from '@/utils'
   export default {
     name: 'articleCreate',
@@ -46,37 +55,50 @@
             required: true,
             message: '内容不能为空',
             trigger: 'blur'
+          }],
+          catalogId: [{
+            required: true,
+            message: '请选择目录',
+            trigger: 'blur'
           }]
         },
         form: {
           title: '',
-          intro: ''
+          intro: '',
+          catalogId: ''
         },
+        catList: [],
         canPush: false
       }
     },
     mounted() {
+      this.getCatalog()
     },
     beforeRouteLeave(to, from, next) {
       if (this.form.intro !== '' || this.form.title !== '') {
-        this.$confirm('您还未保存内容，确定需要离开吗?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          next()
-        })
-      } else {
-        next()
-      } 
+        if (this.canPush == false) {
+          this.$confirm('您还未保存内容，确定需要离开吗?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            next()
+          })
+        } else next()
+      } else next()
     },
     methods: {
+      getCatalog() {
+        serviceSetting.catalogs().then(response => {
+          this.catList = [].concat(response.datas)
+        }).catch(faultHandler)
+      },
       saveBasicInfo() {
         this.$refs.ruleForm.validate(valid => {
           if (valid) {
             createArticle(this.form).then(response => {
+              this.canPush = true
               this.$message.success('保存成功')
-              // 
               this.$router.push('/content')
             }).catch(faultHandler)
           }
