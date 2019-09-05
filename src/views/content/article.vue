@@ -44,7 +44,7 @@
         </el-table-column>
         <el-table-column label='所属分类' prop='catalogName' align="center" width="100px" min-width="100px">
           <template slot-scope='props'>
-            <span class="nowrap">{{props.row.catalogName || '/'}}</span>
+            <span class="nowrap">{{props.row.catalog.name || '/'}}</span>
           </template>
         </el-table-column>
         <el-table-column label='操作' width='200px' min-width="200px" align="center">
@@ -70,7 +70,7 @@
   </div>
 </template>
 <script>
-import { articles } from '@/api/content'
+import * as serviceContent from '@/api/content'
 import { faultHandler } from '@/utils'
 
 export default {
@@ -118,7 +118,7 @@ export default {
   methods: {
     getList(data) {
       data = data || {}
-      articles(data).then(response => {
+      serviceContent.articles(data).then(response => {
         this.list = [].concat(response.datas)
         this.total = response.total
       }).catch(faultHandler)
@@ -143,17 +143,17 @@ export default {
       this.$router.push('/content/articlecreate')
     },
     remove(data) {
-      MessageBox.confirm('是否删除内容', '确定删除', {
+      this.$confirm('是否删除内容', '确定删除', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         this.list.forEach((item, index, arr) => {
-          if (item.pid === data.pid) {
-            removeContent(data.pid).then(response => {
+          if (item._id === data._id) {
+            serviceContent.delArticle(data._id).then(response => {
               this.getList()
               this.$message.success('删除成功')
-            }, errorHandler).catch(faultHandler)
+            }).catch(faultHandler)
           }
         })
       }).catch(() => {

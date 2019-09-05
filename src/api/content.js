@@ -9,3 +9,8 @@ export const createArticle = (data) => {
 export const articles = (data) => {
   return http.get('/content/articles', { params: data })
 }
+
+// 删除文章
+export const delArticle = (id) => {
+  return http.delete('/content/articles/' + id)
+}
