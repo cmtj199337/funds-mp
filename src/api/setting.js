@@ -9,3 +9,13 @@ export const createCatalog = (data) => {
 export const catalogs = (data) => {
   return http.get('/setting/catalog', { params: data })
 }
+
+// 更新目录
+export const catalogUpdate = (id, data) => {
+  return http.put('/setting/catalog/' + id, data)
+}
+
+// 删除目录
+export const delCatalog = (id) => {
+  return http.delete('/setting/catalog/' + id)
+}

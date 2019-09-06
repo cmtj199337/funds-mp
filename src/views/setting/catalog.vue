@@ -51,7 +51,8 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogCatalog = false">取消</el-button>
-          <el-button type="primary" @click="save('ruleForm')">确定</el-button>
+          <el-button type="primary" v-if="editId !== ''" @click="update('ruleForm')">确定</el-button>
+          <el-button type="primary" v-else @click="save('ruleForm')">确定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -85,7 +86,8 @@ export default {
       dialogCatalog: false,
       catalogForm: {
         name: ''
-      }
+      },
+      editId: ''
     }
   },
   mounted() {
@@ -124,18 +126,34 @@ export default {
     toCreate() {
       this.dialogCatalog = true
     },
+    edit(data) {
+      this.dialogCatalog = true
+      this.catalogForm.name = data.name
+      this.editId = data._id
+    },
+    update(formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          serviceSetting.catalogUpdate(this.editId, this.catalogForm).then(response => {
+            this.$message.success('修改成功')
+            this.getList()
+            this.dialogCatalog = false
+          }).catch(faultHandler)
+        }
+      })
+    },
     remove(data) {
-      MessageBox.confirm('是否删除内容', '确定删除', {
+      this.$confirm('是否删除内容', '确定删除', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         this.list.forEach((item, index, arr) => {
-          if (item.pid === data.pid) {
-            removeContent(data.pid).then(response => {
+          if (item._id === data._id) {
+            serviceSetting.delCatalog(data._id).then(response => {
               this.getList()
               this.$message.success('删除成功')
-            }, errorHandler).catch(faultHandler)
+            }).catch(faultHandler)
           }
         })
       }).catch(() => {
