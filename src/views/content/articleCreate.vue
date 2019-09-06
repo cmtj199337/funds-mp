@@ -75,7 +75,7 @@
       }
     },
     mounted() {
-      this.editId = this.$route.query.id
+      this.editId = this.$route.query.id || ''
       this.getCatalog()
       this.getDtail(this.$route.query.id)
     },

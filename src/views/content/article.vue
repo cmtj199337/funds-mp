@@ -34,12 +34,12 @@
       <el-table :data='list' stripe width='100%' ref="table">
         <el-table-column label='内容名称' prop='title' min-width="300px">
           <template slot-scope='props'>
-            <div class="title-img">
-              <div class="font-zone">
-                <h4 class="nowrap-2">{{props.row.title}}</h4>
-                <span class="nowrap">创建时间：{{props.row.createdAt | format}}</span>
-              </div>
-            </div>
+            <h4 class="nowrap-2">{{props.row.title}}</h4>
+          </template>
+        </el-table-column>
+        <el-table-column label='创建时间' align="center" width="200px" min-width="200px">
+          <template slot-scope='props'>
+            <span class="nowrap">{{props.row.createdAt | format}}</span>
           </template>
         </el-table-column>
         <el-table-column label='所属分类' prop='catalogName' align="center" width="100px" min-width="100px">
@@ -180,54 +180,5 @@ export default {
       color: #f56555;
       text-decoration: underline;
     }
-  }
-  .title-img {
-    cursor: pointer;
-    div {
-      float: left;
-    }
-    .img-zone {
-      width: 80px;
-      height: 60px;
-      display: inline-block;
-      overflow: hidden;
-      img {
-        width: 100%;
-      }
-    }
-    .font-zone {
-      display: inline-block;
-      width: 65%;
-      margin-left: 10px;
-      h4 {
-        font-size: 13px;
-        color: #353535;
-        margin: 0;
-        height: 36px;
-        line-height: 1.5;
-      }
-      span {
-        font-size: 12px;
-        color: #888888;
-      }
-    }
-  }
-  .popover-title {
-    height: 50px;
-    line-height: 40px;
-    font-size: 16px;
-    font-weight: normal;
-    margin: 0;
-    border-bottom: 1px solid #eeeeee;
-    text-indent: 1em;
-  }
-  .qrcode {
-    text-align: center;
-    margin: 25px 0 0 0;
-  }
-  .popover-tip {
-    margin: 10px 0 25px 0;
-    display: block;
-    text-align: center;
   }
 </style>
