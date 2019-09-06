@@ -24,7 +24,8 @@
         </el-form-item>
         <!-- 提交 -->
         <div class="sub-btn">
-          <el-button type="primary" @click.native="saveBasicInfo">保存</el-button>
+          <el-button v-if="editId !== ''" type="primary" @click.native="editBasicInfo">保存（修改）</el-button>
+          <el-button v-else type="primary" @click.native="saveBasicInfo">保存</el-button>
         </div>
       </el-form>
     </div>
@@ -32,7 +33,7 @@
 </template>
 <script>
   import Tinymce from '@/components/Tinymce'
-  import { createArticle } from '@/api/content'
+  import * as serviceContent from '@/api/content'
   import * as serviceSetting from '@/api/setting'
   import { faultHandler } from '@/utils'
   export default {
@@ -67,25 +68,40 @@
           intro: '',
           catalogId: ''
         },
+        editForm: {},
         catList: [],
-        canPush: false
+        canPush: false,
+        editId: ''
       }
     },
     mounted() {
+      this.editId = this.$route.query.id
       this.getCatalog()
+      this.getDtail(this.$route.query.id)
     },
     beforeRouteLeave(to, from, next) {
-      if (this.form.intro !== '' || this.form.title !== '') {
+      // 创建
+      if (this.editId == '') {
         if (this.canPush == false) {
-          this.$confirm('您还未保存内容，确定需要离开吗?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            next()
-          })
+          if (this.form.intro !== '' || this.form.title !== '') {
+            this.$confirm('您还未保存内容，确定需要离开吗?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => { next() })
+          } else next()
         } else next()
-      } else next()
+      } else {
+        if (this.canPush == false) {
+          if (this.form.intro !== this.editForm.intro || this.form.title !== this.editForm.title) {
+            this.$confirm('您还未保存内容，确定需要离开吗?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => { next() })
+          } else next()
+        } else next()
+      }
     },
     methods: {
       getCatalog() {
@@ -96,13 +112,32 @@
       saveBasicInfo() {
         this.$refs.ruleForm.validate(valid => {
           if (valid) {
-            createArticle(this.form).then(response => {
+            serviceContent.createArticle(this.form).then(response => {
               this.canPush = true
               this.$message.success('保存成功')
               this.$router.push('/content')
             }).catch(faultHandler)
           }
         })
+      },
+      editBasicInfo() {
+        this.$refs.ruleForm.validate(valid => {
+          if (valid) {
+            serviceContent.articleUpdate(this.editId, this.form).then(response => {
+              this.canPush = true
+              this.$message.success('保存成功')
+              this.$router.push('/content')
+            }).catch(faultHandler)
+          }
+        })
+      },
+      getDtail(id) {
+        serviceContent.articleDetail(id).then(response => {
+          this.form.title = response.datas.title
+          this.form.intro = response.datas.intro
+          this.form.catalogId = response.datas.catalog
+          this.editForm = Object.assign({}, response.datas)
+        }).catch(faultHandler)
       }
     }
   }

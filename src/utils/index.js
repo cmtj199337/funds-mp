@@ -121,6 +121,7 @@ export const errorHandler = (error) => {
 }
 
 export const faultHandler = (error) => {
-  Message.error(error.msg)
+  // Message.error(error.msg)
+  console.log(error)
   return
 }

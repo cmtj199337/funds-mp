@@ -15,12 +15,12 @@
               <el-button @click.native="handleIconClick">搜索</el-button>
             </el-col>
             <el-col>
-              <el-select v-model="status" placeholder="全部状态">
+              <el-select v-model="category" @change="searthByCatalog()" placeholder="全部状态">
                 <el-option
                   v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                  :key="item._id"
+                  :label="item.name"
+                  :value="item._id">
                 </el-option>
               </el-select>
             </el-col>
@@ -71,6 +71,7 @@
 </template>
 <script>
 import * as serviceContent from '@/api/content'
+import * as serviceSetting from '@/api/setting'
 import { faultHandler } from '@/utils'
 
 export default {
@@ -82,22 +83,8 @@ export default {
       currentPage: 1,
       reference: 'reference',
       input: '',
-      status: '',
-      options: [
-        {
-          label: '全部状态',
-          value: -1
-        }, {
-          label: '上架',
-          value: 2
-        }, {
-          label: '下架',
-          value: 1
-        }, {
-          label: '定时上架',
-          value: 3
-        }
-      ],
+      category: '',
+      options: [],
       list: [],
       selection: [],
       screenObj: {},
@@ -114,6 +101,7 @@ export default {
   },
   mounted() {
     this.getList()
+    this.getCatalog()
   },
   methods: {
     getList(data) {
@@ -122,6 +110,17 @@ export default {
         this.list = [].concat(response.datas)
         this.total = response.total
       }).catch(faultHandler)
+    },
+    getCatalog() {
+      serviceSetting.catalogs().then(response => {
+        this.options = response.datas
+      }).catch(faultHandler)
+    },
+    searthByCatalog() {
+      let obj = {}
+      obj.category = this.category
+      this.getList(obj)
+      this.screenObj = obj
     },
     handleIconClick() {
       let obj = this.screenObj
@@ -141,6 +140,9 @@ export default {
     },
     toCreate() {
       this.$router.push('/content/articlecreate')
+    },
+    edit(data) {
+      this.$router.push({path: '/content/articlecreate',query:{id: data._id}})
     },
     remove(data) {
       this.$confirm('是否删除内容', '确定删除', {

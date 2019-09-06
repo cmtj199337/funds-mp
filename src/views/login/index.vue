@@ -92,7 +92,8 @@
       }
     },
     mounted() {
-      // this.getCookie()
+      this.getCookie()
+      this.loginForm.userName = this.$route.query.userName
     },
     methods: {
       setCookie(c_name, c_pwd, exdays) {
