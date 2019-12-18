@@ -15,7 +15,7 @@
               <el-button @click.native="handleIconClick">搜索</el-button>
             </el-col>
             <el-col>
-              <el-select v-model="category" @change="searthByCatalog()" placeholder="全部状态">
+              <el-select v-model="category" @change="searthByCatalog()" placeholder="全部目录">
                 <el-option
                   v-for="item in options"
                   :key="item._id"
