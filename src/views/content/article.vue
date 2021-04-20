@@ -8,14 +8,15 @@
               <el-input 
                 placeholder="输入内容名称"
                 v-model="input"
+                clearable
                 @keyup.enter.native="handleIconClick">
               </el-input>
             </el-col>
             <el-col>
-              <el-button @click.native="handleIconClick">搜索</el-button>
+              <el-button type="primary" @click.native="handleIconClick">搜索</el-button>
             </el-col>
             <el-col>
-              <el-select v-model="category" @change="searthByCatalog()" placeholder="全部目录">
+              <el-select v-model="category" @change="searthByCatalog()" clearable placeholder="全部目录">
                 <el-option
                   v-for="item in options"
                   :key="item._id"
@@ -56,6 +57,7 @@
           </template>
         </el-table-column>
       </el-table>
+      <br>
       <el-pagination
         class="pagination-content"
         @size-change="handleSizeChange"

@@ -137,12 +137,12 @@
         this.$refs.loginForm.validate(valid => {
           if (valid) {
             this.loading = true
-            this.$store.dispatch('app/rememberPassword', this.checked).then(() => {}).catch(() => {})
-            if (this.checked === true) {
-              this.setCookie(this.loginForm.userName, this.loginForm.password, 30)
-            } else {
-              this.clearCookie()
-            }
+            // this.$store.dispatch('app/rememberPassword', this.checked).then(() => {}).catch(() => {})
+            // if (this.checked === true) {
+            //   this.setCookie(this.loginForm.userName, this.loginForm.password, 30)
+            // } else {
+            //   this.clearCookie()
+            // }
             this.$store.dispatch('user/login', this.loginForm).then(() => {
               this.loading = false
               this.$router.push({ path: '/' })

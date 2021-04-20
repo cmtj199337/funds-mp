@@ -40,7 +40,7 @@ const actions = {
         setToken(response.result.token)
         resolve()
       }).catch(error => {
-        Message.error(error.msg)
+        // Message.error(error.msg)
         reject(error)
       })
     })
